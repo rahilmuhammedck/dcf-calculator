@@ -1,91 +1,46 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(DCFCalculatorApp());
+}
 
-class MyApp extends StatelessWidget {
+class DCFCalculatorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'DCF Calculator',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: DCFCalculatorScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class DCFCalculatorScreen extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _DCFCalculatorScreenState createState() => _DCFCalculatorScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _currentIndex = 0;
-
-  final List<Widget> _tabs = [
-    HomeScreen(),
-    FavoritesScreen(),
-    ProfileScreen(),
-  ];
+class _DCFCalculatorScreenState extends State<DCFCalculatorScreen> {
+  // Add your state variables and logic here
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Discounted CashFlow Calculator'),
+        title: Text('DCF Calculator'),
       ),
-      body: _tabs[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (int index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Selected',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Portfolio',
-          ),
-        ],
+      body: Center(
+        // Add your UI components here
+        child: Text(
+          'Welcome to DCF Calculator!',
+          style: TextStyle(fontSize: 24),
+        ),
       ),
     );
   }
 }
+```
 
-class HomeScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Home Screen'),
-    );
-  }
-}
-
-class FavoritesScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Favorites Screen'),
-    );
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Profile Screen'),
-    );
-  }
-}
+ 
