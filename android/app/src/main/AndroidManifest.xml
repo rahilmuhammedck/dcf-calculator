@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="dcf"
+        android:label="DCF"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@assets/icon.png">
         <activity
             android:name=".MainActivity"
             android:exported="true"
