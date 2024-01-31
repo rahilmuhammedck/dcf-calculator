@@ -2,7 +2,7 @@
     <application
         android:label="DCF"
         android:name="${applicationName}"
-        android:icon="@assets/icon.png">
+        android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:exported="true"

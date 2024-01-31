@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -8,7 +9,6 @@ class DCFCalculatorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'DCF Calculator',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -79,22 +79,28 @@ class _DCFInputScreenState extends State<DCFInputScreen> {
                 int forecastYears = int.parse(forecastYearsController.text);
                 double exitMultiple = double.parse(exitMultipleController.text);
 
-                // Perform DCF calculation using retrieved values
+                // Perform DCF calculation
                 double dcfValue = calculateDCF(
-                    netIncome,
-                    depreciation,
-                    amortization,
-                    capEx,
-                    workingCapital,
-                    costOfEquity,
-                    costOfDebt,
-                    taxRate,
-                    terminalGrowthRate,
-                    forecastYears,
-                    exitMultiple);
+                  netIncome,
+                  depreciation,
+                  amortization,
+                  capEx,
+                  workingCapital,
+                  costOfEquity,
+                  costOfDebt,
+                  taxRate,
+                  terminalGrowthRate,
+                  forecastYears,
+                  exitMultiple,
+                );
 
-                // Print or use the DCF value as needed
-                print('DCF Value: $dcfValue');
+                // Navigate to the result screen and pass the calculated DCF value
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DCFResultScreen(dcfValue: dcfValue),
+                  ),
+                );
               },
               child: Text('Calculate DCF'),
             ),
@@ -111,25 +117,71 @@ class _DCFInputScreenState extends State<DCFInputScreen> {
       decoration: InputDecoration(labelText: labelText),
     );
   }
+}
 
-  // Perform DCF calculation using the provided inputs
-  double calculateDCF(
-      double netIncome,
-      double depreciation,
-      double amortization,
-      double capEx,
-      double workingCapital,
-      double costOfEquity,
-      double costOfDebt,
-      double taxRate,
-      double terminalGrowthRate,
-      int forecastYears,
-      double exitMultiple) {
-    // Implement your DCF calculation logic here
-    // ...
+class DCFResultScreen extends StatelessWidget {
+  final double dcfValue;
 
-    // For demonstration purposes, a simple calculation is performed
-    double dcfValue = netIncome - capEx;
-    return dcfValue;
+  DCFResultScreen({required this.dcfValue});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('DCF Result Screen'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('DCF Value:', style: TextStyle(fontSize: 20)),
+              Text('$dcfValue',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
+      ),
+    );
   }
+}
+
+double calculateDCF(
+  double netIncome,
+  double depreciation,
+  double amortization,
+  double capEx,
+  double workingCapital,
+  double costOfEquity,
+  double costOfDebt,
+  double taxRate,
+  double terminalGrowthRate,
+  int forecastYears,
+  double exitMultiple,
+) {
+  List<double> freeCashFlows = [];
+  for (int year = 1; year <= forecastYears; year++) {
+    double fcf =
+        (netIncome + depreciation + amortization - capEx - workingCapital) *
+            (1 - taxRate);
+    freeCashFlows.add(fcf);
+  }
+
+  double terminalYearFCF = freeCashFlows.last * (1 + terminalGrowthRate);
+  double terminalValue = terminalYearFCF / (costOfEquity - terminalGrowthRate);
+
+  double dcfValue = 0.0;
+  for (int year = 1; year <= forecastYears; year++) {
+    double discountFactor = 1 / pow(1 + costOfEquity, year);
+    dcfValue += freeCashFlows[year - 1] * discountFactor;
+  }
+
+  if (forecastYears > 0) {
+    dcfValue += terminalValue / pow(1 + costOfEquity, forecastYears);
+  }
+
+  dcfValue *= exitMultiple;
+
+  return dcfValue;
 }
