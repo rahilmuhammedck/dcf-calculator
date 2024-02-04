@@ -1,5 +1,6 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'dart:math';
 
 void main() {
   runApp(DCFCalculatorApp());
@@ -9,6 +10,7 @@ class DCFCalculatorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'DCF Calculator',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -50,21 +52,18 @@ class _DCFInputScreenState extends State<DCFInputScreen> {
             buildTextField("Net Income", netIncomeController),
             buildTextField("Depreciation", depreciationController),
             buildTextField("Amortization", amortizationController),
-            buildTextField("Capital Expenditures", capExController),
-            buildTextField(
-                "Changes in Working Capital", workingCapitalController),
+            buildTextField("Capital Expenditures (CapEx)", capExController),
+            buildTextField("Working Capital Changes", workingCapitalController),
             buildTextField("Cost of Equity", costOfEquityController),
             buildTextField("Cost of Debt", costOfDebtController),
             buildTextField("Tax Rate", taxRateController),
             buildTextField(
                 "Terminal Growth Rate", terminalGrowthRateController),
-            buildTextField(
-                "Number of Years in Forecast", forecastYearsController),
+            buildTextField("Forecast Years", forecastYearsController),
             buildTextField("Exit Multiple", exitMultipleController),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Retrieve values from controllers and use them for DCF calculation
                 double netIncome = double.parse(netIncomeController.text);
                 double depreciation = double.parse(depreciationController.text);
                 double amortization = double.parse(amortizationController.text);
@@ -79,7 +78,6 @@ class _DCFInputScreenState extends State<DCFInputScreen> {
                 int forecastYears = int.parse(forecastYearsController.text);
                 double exitMultiple = double.parse(exitMultipleController.text);
 
-                // Perform DCF calculation
                 double dcfValue = calculateDCF(
                   netIncome,
                   depreciation,
@@ -94,7 +92,6 @@ class _DCFInputScreenState extends State<DCFInputScreen> {
                   exitMultiple,
                 );
 
-                // Navigate to the result screen and pass the calculated DCF value
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -119,10 +116,18 @@ class _DCFInputScreenState extends State<DCFInputScreen> {
   }
 }
 
-class DCFResultScreen extends StatelessWidget {
+class DCFResultScreen extends StatefulWidget {
   final double dcfValue;
 
   DCFResultScreen({required this.dcfValue});
+
+  @override
+  _DCFResultScreenState createState() => _DCFResultScreenState();
+}
+
+class _DCFResultScreenState extends State<DCFResultScreen> {
+  TextEditingController numberOfSharesController = TextEditingController();
+  TextEditingController currentMarketPriceController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -137,12 +142,89 @@ class DCFResultScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('DCF Value:', style: TextStyle(fontSize: 20)),
-              Text('$dcfValue',
+              Text('${widget.dcfValue}',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              SizedBox(height: 20),
+              buildTextField("Number of Shares", numberOfSharesController),
+              buildTextField(
+                  "Current Market Price", currentMarketPriceController),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  double numberOfShares =
+                      double.parse(numberOfSharesController.text);
+                  double currentMarketPrice =
+                      double.parse(currentMarketPriceController.text);
+
+                  double sharePrice = widget.dcfValue / numberOfShares;
+                  double percentageDifference =
+                      ((currentMarketPrice - sharePrice) / sharePrice) * 100;
+
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Comparison Result'),
+                        content: Column(
+                          children: [
+                            Text('Estimated Share Price: $sharePrice'),
+                            Text('Current Market Price: $currentMarketPrice'),
+                            SizedBox(height: 10),
+                            Text(
+                                'Percentage Difference: $percentageDifference%'),
+                            SizedBox(height: 20),
+                            SizedBox(
+                              width: 200,
+                              height: 200,
+                              child: PieChart(
+                                PieChartData(
+                                  sectionsSpace: 5,
+                                  centerSpaceRadius: 40,
+                                  sections: [
+                                    PieChartSectionData(
+                                      color: Colors.blue,
+                                      value: sharePrice,
+                                      title: 'Estimated',
+                                      radius: 50,
+                                    ),
+                                    PieChartSectionData(
+                                      color: Colors.orange,
+                                      value: currentMarketPrice,
+                                      title: 'Current',
+                                      radius: 50,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text('OK'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                child: Text('Compare with Current Market Price'),
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget buildTextField(String labelText, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      keyboardType: TextInputType.numberWithOptions(decimal: true),
+      decoration: InputDecoration(labelText: labelText),
     );
   }
 }
@@ -161,6 +243,7 @@ double calculateDCF(
   double exitMultiple,
 ) {
   List<double> freeCashFlows = [];
+
   for (int year = 1; year <= forecastYears; year++) {
     double fcf =
         (netIncome + depreciation + amortization - capEx - workingCapital) *
@@ -172,6 +255,7 @@ double calculateDCF(
   double terminalValue = terminalYearFCF / (costOfEquity - terminalGrowthRate);
 
   double dcfValue = 0.0;
+
   for (int year = 1; year <= forecastYears; year++) {
     double discountFactor = 1 / pow(1 + costOfEquity, year);
     dcfValue += freeCashFlows[year - 1] * discountFactor;
