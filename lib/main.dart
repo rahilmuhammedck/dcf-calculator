@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
+import 'start_page.dart';
 
 void main() {
   runApp(DCFCalculatorApp());
@@ -15,7 +16,7 @@ class DCFCalculatorApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: DCFInputScreen(),
+      home: StartPage(),
     );
   }
 }
@@ -44,7 +45,7 @@ class _DCFInputScreenState extends State<DCFInputScreen> {
       appBar: AppBar(
         title: Text('DCF Input Screen'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
