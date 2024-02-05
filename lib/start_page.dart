@@ -21,7 +21,7 @@ class StartPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => StartPage()),
+                  MaterialPageRoute(builder: (context) => DCFInputScreen()),
                 );
               },
               child: Text('Start DCF Calculation'),
