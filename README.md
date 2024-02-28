@@ -1,6 +1,6 @@
-# dcf
+# DCF CALCULATOR 
 
-A new Flutter project.
+A Flutter based Application for calculating DCF value 
 
 ## Getting Started
 
