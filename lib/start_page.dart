@@ -6,14 +6,14 @@ class StartPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Start Page'),
+        title: Text('DCF Calculator'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Welcome to DCF Calculator App!',
+              'Welcome!',
               style: TextStyle(fontSize: 20),
             ),
             SizedBox(height: 20),
